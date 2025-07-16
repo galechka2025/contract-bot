@@ -1,2 +1,3 @@
 python-telegram-bot==20.3
-docxtpl
+docxtpl==0.16.0
+aiohttp
