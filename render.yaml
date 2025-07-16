@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: contract-bot
+    env: python
+    plan: free
+    region: frankfurt
+    buildCommand: ""
+    startCommand: "python bot.py"
+    autoDeploy: true
+    envVars:
+      - key: TELEGRAM_TOKEN
+        sync: false
