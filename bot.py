@@ -1,5 +1,4 @@
 import asyncio
-import threading
 from aiohttp import web
 from telegram import Update
 from telegram.ext import (
@@ -163,7 +162,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Действие отменено. Чтобы начать заново, напишите 'Привет' или /start.")
     return ConversationHandler.END
 
-def run_bot():
+def build_application():
     app = ApplicationBuilder().token("7473455482:AAGawnsxRqIaU58gSroSupIIwVYf_3nGMm0").build()
 
     conv_handler = ConversationHandler(
@@ -202,24 +201,32 @@ def run_bot():
 
     app.add_handler(conv_handler)
     app.add_handler(CommandHandler("help", help_command))
+    return app
 
+async def start_bot():
+    app = build_application()
     print("🤖 Бот запущен и готов к работе")
-    app.run_polling()
+    await app.run_polling()
 
 async def handle(request):
     return web.Response(text="OK")
 
-async def run_app():
+async def start_webserver():
     app = web.Application()
     app.router.add_get('/', handle)
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, '0.0.0.0', 8080)
     await site.start()
-    print("HTTP сервер запущен на порту 8080")
+    print("🌐 Веб-сервер запущен на порту 8080")
     while True:
         await asyncio.sleep(3600)
 
-if __name__ == '__main__':
-    threading.Thread(target=run_bot).start()
-    asyncio.run(run_app())
+async def main():
+    await asyncio.gather(
+        start_bot(),
+        start_webserver()
+    )
+
+if __name__ == "__main__":
+    asyncio.run(main())
